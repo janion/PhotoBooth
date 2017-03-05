@@ -26,7 +26,10 @@ class Camera():
                    ]
     EFFECT_INDEX = -1;
     
-    PHOTO_NAME_FORMAT = "Photo%05d"
+    PHOTO_FILE_EXTENSION = ".jpg"
+    VIDEO_FILE_EXTENSION = ".h264"
+    PHOTO_NAME_FORMAT = "Photo%05d" + PHOTO_FILE_EXTENSION
+    VIDEO_NAME_FORMAT = "Video%05d" + VIDEO_FILE_EXTENSION
 
     def __init__(self,):
         self.camera = PiCamera()
@@ -65,7 +68,7 @@ class Camera():
 ################################################################################
 
     def takePhoto(self):
-        count = len(os.listdir(self.directory))
+        count = [name for name in os.listdir(self.directory) if name.endsWith(self.PHOTO_FILE_EXTENSION)]
         self.camera.capture(self.PHOTO_NAME_FORMAT % (count + 1))
 
 ################################################################################
@@ -82,3 +85,14 @@ class Camera():
 
     def getPhotoDirectory(self):
         return self.directory
+
+################################################################################
+
+    def startRecording(self):
+        count = [name for name in os.listdir(self.directory) if name.endsWith(self.VIDEO_FILE_EXTENSION)]
+        self.camera.start_recording(self.VIDEO_NAME_FORMAT % (count + 1))
+
+################################################################################
+
+    def stopRecording(self):
+        self.camera.stop_recording()
