@@ -68,7 +68,7 @@ class Camera():
 ################################################################################
 
     def takePhoto(self):
-        count = [name for name in os.listdir(self.directory) if name.endsWith(self.PHOTO_FILE_EXTENSION)]
+        count = len([name for name in os.listdir(self.directory) if name.endswith(self.PHOTO_FILE_EXTENSION)])
         self.camera.capture(self.PHOTO_NAME_FORMAT % (count + 1))
 
 ################################################################################
@@ -89,7 +89,7 @@ class Camera():
 ################################################################################
 
     def startRecording(self):
-        count = [name for name in os.listdir(self.directory) if name.endsWith(self.VIDEO_FILE_EXTENSION)]
+        count = len([name for name in os.listdir(self.directory) if name.endswith(self.VIDEO_FILE_EXTENSION)])
         self.camera.start_recording(self.VIDEO_NAME_FORMAT % (count + 1))
 
 ################################################################################

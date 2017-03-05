@@ -25,9 +25,17 @@ class Window(wx.Frame):
         self.takingPhoto = False
         self.setupCamera()
         self.SetTitle(self.TITLE % self.camera.getPhotoDirectory())
+        
+        self.label1 = wx.StaticText(self.panel, -1, label="", style=wx.ALIGN_CENTER)
+        self.label2 = wx.StaticText(self.panel, -1, label="", style=wx.ALIGN_CENTER)
+        topSizer = wx.BoxSizer(wx.HORIZONTAL)
+        topSizer.AddStretchSpacer(1)
+        topSizer.Add(self.label1, 1, wx.ALL|wx.EXPAND, 5)
+        topSizer.AddStretchSpacer(50)
+        topSizer.Add(self.label2, 1, wx.ALL|wx.EXPAND, 5)
+        topSizer.AddStretchSpacer(5)
 
-        self.btn = wx.Button(self.panel, -1, label="Go", size=(100, 100))
-        self.label = wx.StaticText(self.panel, -1, label="")
+        self.goBtn = wx.Button(self.panel, -1, label="Go", size=(100, 100))
         self.effectBtn = wx.Button(self.panel, -1,
                                    label=self.EFFECT_LABEL %
                                    self.camera.getEffectName(),
@@ -35,8 +43,21 @@ class Window(wx.Frame):
                                    style=wx.ID_JUSTIFY_RIGHT
                                    )
 
-        self.btn.SetBackgroundColour(self.SELECTED)
-        self.btn.SetFocus()
+        self.goBtn.SetBackgroundColour(self.SELECTED)
+        self.goBtn.SetFocus()
+        bottomSizer = wx.BoxSizer(wx.HORIZONTAL)
+        bottomSizer.AddStretchSpacer()
+        bottomSizer.Add(self.goBtn, 0, wx.ALL|wx.EXPAND, 5)
+        bottomSizer.AddStretchSpacer()
+        bottomSizer.Add(self.effectBtn, 0, wx.ALL|wx.EXPAND, 5)
+        bottomSizer.AddStretchSpacer()
+        
+        fullSizer = wx.BoxSizer(wx.VERTICAL)
+        fullSizer.Add(topSizer, 0, wx.ALL|wx.EXPAND, 5)
+        fullSizer.AddStretchSpacer()
+        fullSizer.Add(bottomSizer, 0, wx.ALL|wx.EXPAND, 5)
+        self.panel.SetSizer(fullSizer)
+        
         self.Maximize()
         self.setupMenu()
 
@@ -44,8 +65,8 @@ class Window(wx.Frame):
         self.Bind(wx.EVT_SIZE, self.onSizeOrMove)
         self.Bind(wx.EVT_MOVE, self.onSizeOrMove)
 
-        self.btn.Bind(wx.EVT_BUTTON, self.takePhoto)
-        self.btn.Bind(wx.EVT_CHAR, self.keyPress)
+        self.goBtn.Bind(wx.EVT_BUTTON, self.takePhoto)
+        self.goBtn.Bind(wx.EVT_CHAR, self.keyPress)
 
         self.effectBtn.Bind(wx.EVT_BUTTON, self.effect)
         self.effectBtn.Bind(wx.EVT_CHAR, self.keyPress)
@@ -88,13 +109,13 @@ class Window(wx.Frame):
 ################################################################################
 
     def keyPress(self, event):
-        if event.GetEventObject() == self.btn and event.GetUnicodeKey() == 316:
+        if event.GetEventObject() == self.goBtn and event.GetUnicodeKey() == 316:
             self.effectBtn.SetFocus()
             self.effectBtn.SetBackgroundColour(self.SELECTED)
-            self.btn.SetBackgroundColour(None)
+            self.goBtn.SetBackgroundColour(None)
         elif event.GetEventObject() == self.effectBtn and event.GetUnicodeKey() == 314:
-            self.btn.SetFocus()
-            self.btn.SetBackgroundColour(self.SELECTED)
+            self.goBtn.SetFocus()
+            self.goBtn.SetBackgroundColour(self.SELECTED)
             self.effectBtn.SetBackgroundColour(None)
         event.Skip()
 
@@ -114,13 +135,15 @@ class Window(wx.Frame):
         newWidth = int(0.75 * width)
 
         self.camera.setPreview(x, y, newWidth, int(newWidth * resRatio))
+#         self.fakeDisplay.SetSize((newWidth / 10, int(newWidth * resRatio) / 10))
 
-        [btnWidth, btnHeight] = self.btn.GetSize()
-        self.effectBtn.SetPosition(((((3 * width) / 2) - btnWidth) / 2, height - btnHeight - 50))
-        self.btn.SetPosition((((width / 2) - btnWidth) / 2, height - btnHeight - 50))
-        self.label.SetPosition(((width - btnWidth) / 2, height - self.label.GetSize()[1] - 10))
+#         [btnWidth, btnHeight] = self.goBtn.GetSize()
+#         self.effectBtn.SetPosition(((((3 * width) / 2) - btnWidth) / 2, height - btnHeight - 50))
+#         self.goBtn.SetPosition((((width / 2) - btnWidth) / 2, height - btnHeight - 50))
+#         self.label1.SetPosition(((width - btnWidth) / 2, height - self.label1.GetSize()[1] - 10))
 
-        self.label.SetFont(wx.Font(height / 8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.label1.SetFont(wx.Font(height / 8, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.label2.SetFont(wx.Font(height / 8, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         event.Skip()
 
@@ -148,9 +171,11 @@ class Window(wx.Frame):
 
     def countdown(self):
         for x in xrange(5, 0, -1):
-            wx.CallAfter(self.label.SetLabel, str(x))
+            wx.CallAfter(self.label1.SetLabel, str(x))
+            wx.CallAfter(self.label2.SetLabel, str(x))
             sleep(1)
-        wx.CallAfter(self.label.SetLabel, "")
+        wx.CallAfter(self.label1.SetLabel, "")
+        wx.CallAfter(self.label2.SetLabel, "")
 
         self.camera.takePhoto()
         self.takingPhoto = False
