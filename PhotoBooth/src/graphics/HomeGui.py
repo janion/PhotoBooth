@@ -5,7 +5,7 @@ Created on 4 Jan 2017
 '''
 
 import wx
-from time import sleep
+from time import sleep, time
 from threading import Thread
 
 from src.graphics.camera.MockCamera import Camera
@@ -16,41 +16,27 @@ class Window(wx.Frame):
     EFFECT_LABEL = "Effect\n(%s)"
     SCREEN_OFFSET_X = 24
     SCREEN_OFFSET_Y = 46
-    SELECTED = (255, 200, 200)
+    FOCUS_COLOUR = (255, 200, 200)
+    MODE_LABEL = "Mode\n(%s)"
+    MODE_SINGLE = "Single"
+    MODE_4_TILE = "4 Tile"
+    MODE_VIDEO = "Video"
+    MODES = [MODE_SINGLE, MODE_4_TILE, MODE_VIDEO]
+    PHOTO_COUNTDOWN_TIME = 5
+    VIDEO_MAX_LENGTH = 5
 
     def __init__(self, parent, idd):
         wx.Frame.__init__(self, parent, idd)
         self.panel = wx.Panel(self, -1)
 
-        self.takingPhoto = False
+        self.isTakingPhoto = False
+        self.isRecording = False
         self.setupCamera()
         self.SetTitle(self.TITLE % self.camera.getPhotoDirectory())
         
-        self.label1 = wx.StaticText(self.panel, -1, label="", style=wx.ALIGN_CENTER)
-        self.label2 = wx.StaticText(self.panel, -1, label="", style=wx.ALIGN_CENTER)
-        topSizer = wx.BoxSizer(wx.HORIZONTAL)
-        topSizer.AddStretchSpacer(1)
-        topSizer.Add(self.label1, 1, wx.ALL|wx.EXPAND, 5)
-        topSizer.AddStretchSpacer(50)
-        topSizer.Add(self.label2, 1, wx.ALL|wx.EXPAND, 5)
-        topSizer.AddStretchSpacer(5)
-
-        self.goBtn = wx.Button(self.panel, -1, label="Go", size=(100, 100))
-        self.effectBtn = wx.Button(self.panel, -1,
-                                   label=self.EFFECT_LABEL %
-                                   self.camera.getEffectName(),
-                                   size=(100, 100),
-                                   style=wx.ID_JUSTIFY_RIGHT
-                                   )
-
-        self.goBtn.SetBackgroundColour(self.SELECTED)
-        self.goBtn.SetFocus()
-        bottomSizer = wx.BoxSizer(wx.HORIZONTAL)
-        bottomSizer.AddStretchSpacer()
-        bottomSizer.Add(self.goBtn, 0, wx.ALL|wx.EXPAND, 5)
-        bottomSizer.AddStretchSpacer()
-        bottomSizer.Add(self.effectBtn, 0, wx.ALL|wx.EXPAND, 5)
-        bottomSizer.AddStretchSpacer()
+        topSizer = self.createLabels()
+        
+        bottomSizer = self.createButtons()
         
         fullSizer = wx.BoxSizer(wx.VERTICAL)
         fullSizer.Add(topSizer, 0, wx.ALL|wx.EXPAND, 5)
@@ -65,11 +51,62 @@ class Window(wx.Frame):
         self.Bind(wx.EVT_SIZE, self.onSizeOrMove)
         self.Bind(wx.EVT_MOVE, self.onSizeOrMove)
 
-        self.goBtn.Bind(wx.EVT_BUTTON, self.takePhoto)
-        self.goBtn.Bind(wx.EVT_CHAR, self.keyPress)
+################################################################################
 
-        self.effectBtn.Bind(wx.EVT_BUTTON, self.effect)
-        self.effectBtn.Bind(wx.EVT_CHAR, self.keyPress)
+    def createLabels(self):
+        self.label1 = wx.StaticText(self.panel, -1, label="", style=wx.ALIGN_CENTER)
+        self.label2 = wx.StaticText(self.panel, -1, label="", style=wx.ALIGN_CENTER)
+        topSizer = wx.BoxSizer(wx.HORIZONTAL)
+        topSizer.AddStretchSpacer(1)
+        topSizer.Add(self.label1, 1, wx.ALL|wx.EXPAND, 5)
+        topSizer.AddStretchSpacer(50)
+        topSizer.Add(self.label2, 1, wx.ALL|wx.EXPAND, 5)
+        topSizer.AddStretchSpacer(5)
+        
+        return topSizer
+
+################################################################################
+
+    def createButtons(self):
+        self.goBtn = wx.Button(self.panel, -1, label="Go", size=(100, 100))
+        self.effectBtn = wx.Button(self.panel, -1,
+                                   label=self.EFFECT_LABEL %
+                                   self.camera.getEffectName(),
+                                   size=(100, 100)
+                                   )
+        self.mode = 0
+        self.modeBtn = wx.Button(self.panel, -1,
+                                   label=self.MODE_LABEL %
+                                   self.MODES[self.mode],
+                                   size=(100, 100)
+                                   )
+
+        bottomSizer = wx.BoxSizer(wx.HORIZONTAL)
+        bottomSizer.AddStretchSpacer()
+        bottomSizer.Add(self.modeBtn, 0, wx.ALL|wx.EXPAND, 5)
+        bottomSizer.AddStretchSpacer()
+        bottomSizer.Add(self.goBtn, 0, wx.ALL|wx.EXPAND, 5)
+        bottomSizer.AddStretchSpacer()
+        bottomSizer.Add(self.effectBtn, 0, wx.ALL|wx.EXPAND, 5)
+        bottomSizer.AddStretchSpacer()
+        
+        # Mode button
+        self.modeBtn.Bind(wx.EVT_SET_FOCUS, lambda event: self.modeBtn.SetBackgroundColour(self.FOCUS_COLOUR))
+        self.modeBtn.Bind(wx.EVT_KILL_FOCUS, lambda event: self.modeBtn.SetBackgroundColour(None))
+        # Go button
+        self.goBtn.Bind(wx.EVT_SET_FOCUS, lambda event: self.goBtn.SetBackgroundColour(self.FOCUS_COLOUR))
+        self.goBtn.Bind(wx.EVT_KILL_FOCUS, lambda event: self.goBtn.SetBackgroundColour(None))
+        # Effect button
+        self.effectBtn.Bind(wx.EVT_SET_FOCUS, lambda event: self.effectBtn.SetBackgroundColour(self.FOCUS_COLOUR))
+        self.effectBtn.Bind(wx.EVT_KILL_FOCUS, lambda event: self.effectBtn.SetBackgroundColour(None))
+        
+        self.goBtn.SetFocus()
+        
+        self.modeBtn.Bind(wx.EVT_BUTTON, self.changeMode)
+        self.goBtn.Bind(wx.EVT_BUTTON, self.doCameraAction)
+        self.effectBtn.Bind(wx.EVT_BUTTON, self.changeEffect)
+        
+        return bottomSizer
 
 ################################################################################
 
@@ -91,7 +128,7 @@ class Window(wx.Frame):
         self.SetMenuBar(self.menuBar)
         
         self.Bind(wx.EVT_MENU, self.setPhotoDirectory, id=101)
-        self.Bind(wx.EVT_MENU, self.onClose, id=102)
+        self.Bind(wx.EVT_MENU, self.close, id=102)
         
 ################################################################################
 
@@ -105,19 +142,6 @@ class Window(wx.Frame):
             self.SetTitle(self.TITLE % self.camera.getPhotoDirectory())
 
         dlg.Destroy()
-
-################################################################################
-
-    def keyPress(self, event):
-        if event.GetEventObject() == self.goBtn and event.GetUnicodeKey() == 316:
-            self.effectBtn.SetFocus()
-            self.effectBtn.SetBackgroundColour(self.SELECTED)
-            self.goBtn.SetBackgroundColour(None)
-        elif event.GetEventObject() == self.effectBtn and event.GetUnicodeKey() == 314:
-            self.goBtn.SetFocus()
-            self.goBtn.SetBackgroundColour(self.SELECTED)
-            self.effectBtn.SetBackgroundColour(None)
-        event.Skip()
 
 ################################################################################
 
@@ -135,12 +159,6 @@ class Window(wx.Frame):
         newWidth = int(0.75 * width)
 
         self.camera.setPreview(x, y, newWidth, int(newWidth * resRatio))
-#         self.fakeDisplay.SetSize((newWidth / 10, int(newWidth * resRatio) / 10))
-
-#         [btnWidth, btnHeight] = self.goBtn.GetSize()
-#         self.effectBtn.SetPosition(((((3 * width) / 2) - btnWidth) / 2, height - btnHeight - 50))
-#         self.goBtn.SetPosition((((width / 2) - btnWidth) / 2, height - btnHeight - 50))
-#         self.label1.SetPosition(((width - btnWidth) / 2, height - self.label1.GetSize()[1] - 10))
 
         self.label1.SetFont(wx.Font(height / 8, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.label2.SetFont(wx.Font(height / 8, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -149,17 +167,37 @@ class Window(wx.Frame):
 
 ################################################################################
 
-    def effect(self, event):
-        self.camera.effect()
+    def changeEffect(self, event):
+        self.camera.changeEffect()
         self.effectBtn.SetLabel(self.EFFECT_LABEL % self.camera.getEffectName())
 
 ################################################################################
 
-    def takePhoto(self, event):
-        if not self.takingPhoto:
-            self.takingPhoto = True
-            photoThread = Thread(target=self.countdown)
+    def changeMode(self, event):
+        self.mode = (self.mode + 1) % len(self.MODES)
+        self.modeBtn.SetLabel(self.MODE_LABEL % self.MODES[self.mode])
+
+################################################################################
+
+    def doCameraAction(self, event):
+        if self.MODES[self.mode] == self.MODE_SINGLE and not self.isTakingPhoto:
+            photoThread = Thread(target=self.countdownToSinglePhoto)
             photoThread.start()
+        elif self.MODES[self.mode] == self.MODE_4_TILE:
+            pass
+        elif self.MODES[self.mode] == self.MODE_VIDEO:
+            if not self.isRecording:
+                self.isRecording = True
+                # Start timer
+                videoThread = Thread(target=self.countdownForVideo)
+                videoThread.start()
+            else:
+                self.isRecording = False
+
+################################################################################
+
+    def close(self, event):
+        self.Close()
 
 ################################################################################
 
@@ -169,13 +207,43 @@ class Window(wx.Frame):
 
 ################################################################################
 
-    def countdown(self):
-        for x in xrange(5, 0, -1):
+    def countdownForVideo(self):
+        self.modeBtn.Enable(False)
+        self.camera.startRecording()
+        startTime = time()
+        
+        wx.CallAfter(self.label1.SetForegroundColour, (255, 0, 0))
+        wx.CallAfter(self.label2.SetForegroundColour, (255, 0, 0))
+        for x in xrange(self.VIDEO_MAX_LENGTH, 0, -1):
+            wx.CallAfter(self.label1.SetLabel, str(x))
+            wx.CallAfter(self.label2.SetLabel, str(x))
+            
+            while(time() < startTime + 1 + (self.VIDEO_MAX_LENGTH - x)):
+                if not self.isRecording:
+                    # Reset labels
+                    wx.CallAfter(self.label1.SetForegroundColour, None)
+                    wx.CallAfter(self.label2.SetForegroundColour, None)
+                    break;
+                
+        wx.CallAfter(self.label1.SetLabel, "")
+        wx.CallAfter(self.label2.SetLabel, "")
+
+        self.camera.stopRecording()
+        self.isRecording = False
+        self.modeBtn.Enable(True)
+
+################################################################################
+
+    def countdownToSinglePhoto(self):
+        self.isTakingPhoto = True
+        self.modeBtn.Enable(False)
+        for x in xrange(self.PHOTO_COUNTDOWN_TIME, 0, -1):
             wx.CallAfter(self.label1.SetLabel, str(x))
             wx.CallAfter(self.label2.SetLabel, str(x))
             sleep(1)
         wx.CallAfter(self.label1.SetLabel, "")
         wx.CallAfter(self.label2.SetLabel, "")
 
-        self.camera.takePhoto()
-        self.takingPhoto = False
+        self.camera.doCameraAction()
+        self.isTakingPhoto = False
+        self.modeBtn.Enable(True)

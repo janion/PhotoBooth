@@ -44,7 +44,7 @@ class Camera():
 
     def startPreview(self, x, y, width, height):
         self.camera.start_preview(fullscreen=False, hflip=True, window=(x, y, width, height))
-        self.effect()
+        self.changeEffect()
 
 ################################################################################
 
@@ -53,7 +53,7 @@ class Camera():
 
 ################################################################################
 
-    def effect(self):
+    def changeEffect(self):
         self.EFFECT_INDEX = (self.EFFECT_INDEX + 1) % len(self.EFFECTS)
         self.camera.image_effect = self.EFFECTS[self.EFFECT_INDEX]
 
@@ -67,7 +67,7 @@ class Camera():
 
 ################################################################################
 
-    def takePhoto(self):
+    def doCameraAction(self):
         count = len([name for name in os.listdir(self.directory) if name.endswith(self.PHOTO_FILE_EXTENSION)])
         self.camera.capture(self.PHOTO_NAME_FORMAT % (count + 1))
 

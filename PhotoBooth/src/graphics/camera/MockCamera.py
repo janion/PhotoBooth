@@ -32,7 +32,7 @@ class Camera():
 
 ################################################################################
 
-    def effect(self):
+    def changeEffect(self):
         self.EFFECT_INDEX = (self.EFFECT_INDEX + 1) % len(self.EFFECTS)
         print "Effect changed"
 
@@ -43,7 +43,7 @@ class Camera():
 
 ################################################################################
 
-    def takePhoto(self):
+    def doCameraAction(self):
         print "Photo taken"
 
 ################################################################################
@@ -60,3 +60,13 @@ class Camera():
 
     def getPhotoDirectory(self):
         return self.directory
+
+################################################################################
+
+    def startRecording(self):
+        print "Starting recording"
+
+################################################################################
+
+    def stopRecording(self):
+        print "Stopping recording"
