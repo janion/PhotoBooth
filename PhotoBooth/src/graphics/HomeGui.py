@@ -8,8 +8,8 @@ import wx
 from time import sleep, time
 from threading import Thread
 
-from src.graphics.camera.MockCamera import Camera
-from src.graphics.physical.MockPhysicalTriggers import PhysicalTriggers
+from src.physical.camera.MockCamera import Camera
+from src.physical.triggers.MockPhysicalTriggers import PhysicalTriggers
 
 class Window(wx.Frame):
 
