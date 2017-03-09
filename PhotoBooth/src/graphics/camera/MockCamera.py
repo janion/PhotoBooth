@@ -32,9 +32,15 @@ class Camera():
 
 ################################################################################
 
-    def changeEffect(self):
+    def changeEffectUp(self):
         self.EFFECT_INDEX = (self.EFFECT_INDEX + 1) % len(self.EFFECTS)
-        print "Effect changed"
+        print "Effect changed up"
+
+################################################################################
+
+    def changeEffectDown(self):
+        self.EFFECT_INDEX = ((len(self.EFFECTS) + self.EFFECT_INDEX) - 1) % len(self.EFFECTS)
+        print "Effect changed down"
 
 ################################################################################
 
@@ -43,7 +49,7 @@ class Camera():
 
 ################################################################################
 
-    def doCameraAction(self):
+    def takePhoto(self):
         print "Photo taken"
 
 ################################################################################
@@ -70,3 +76,13 @@ class Camera():
 
     def stopRecording(self):
         print "Stopping recording"
+
+################################################################################
+
+    def startSequence(self):
+        print "Starting sequence"
+
+################################################################################
+
+    def stopSequence(self):
+        print "Stopping sequence"
