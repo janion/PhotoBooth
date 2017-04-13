@@ -61,6 +61,11 @@ class Window(wx.Frame):
 
 ################################################################################
 
+    def toggleFullScreen(self, event):
+        self.camera.setPreviewFullscreen(not self.camera.previewIsFullscreen())
+
+################################################################################
+
     def createLabels(self):
         self.label1 = wx.StaticText(self.panel, -1, label="", style=wx.ALIGN_CENTER)
         self.label2 = wx.StaticText(self.panel, -1, label="", style=wx.ALIGN_CENTER)
@@ -118,6 +123,7 @@ class Window(wx.Frame):
     def setupMenu(self):
         self.menuBar = wx.MenuBar()
         
+        # File menu
         menu1 = wx.Menu()
         menu1.Append(101, "Set photo directory")
         menu1.AppendSeparator()
@@ -128,6 +134,11 @@ class Window(wx.Frame):
         
         self.Bind(wx.EVT_MENU, self.setPhotoDirectory, id=101)
         self.Bind(wx.EVT_MENU, self.close, id=102)
+        
+        # Setup keyboard shortcuts
+        shortcuts = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('P'), 1001)])
+        self.SetAcceleratorTable(shortcuts)
+        self.Bind(wx.EVT_MENU, self.toggleFullScreen, id=1001)
         
 ################################################################################
 

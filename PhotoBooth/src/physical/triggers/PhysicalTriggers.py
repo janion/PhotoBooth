@@ -9,10 +9,10 @@ import RPi.GPIO as GPIO
 
 class PhysicalTriggers():
     
-    MODE_BUTTON = 3;
-    EFFECT_UP_BUTTON = 5;
-    EFFECT_DOWN_BUTTON = 7;
-    GO_BUTTON = 8;
+    MODE_BUTTON = 3
+    EFFECT_UP_BUTTON = 5
+    EFFECT_DOWN_BUTTON = 7
+    GO_BUTTON = 8
     BUTTONS = [MODE_BUTTON, EFFECT_UP_BUTTON, EFFECT_DOWN_BUTTON, GO_BUTTON]
     
     def start(self, modeAction, goAction, effectUpAction, effectDownAction):

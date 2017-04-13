@@ -9,7 +9,8 @@ class Camera():
                "cartoon", "colorswap", "colorswap",
                "posterise"
                ]
-    EFFECT_INDEX = 0;
+    effectIndex = 0;
+    isFull = False
 
     def __init__(self,):
         print "Camera created"
@@ -27,25 +28,39 @@ class Camera():
 
 ################################################################################
 
+    def setPreviewFullscreen(self, isFull):
+        self.isFull = isFull
+        if isFull:
+            print "Preview full screen"
+        else:
+            print "Preview not full screen"
+
+################################################################################
+
+    def previewIsFullscreen(self):
+        return self.isFull
+
+################################################################################
+
     def setPreview(self, x, y, width, height):
         print "Preview set"
 
 ################################################################################
 
     def changeEffectUp(self):
-        self.EFFECT_INDEX = (self.EFFECT_INDEX + 1) % len(self.EFFECTS)
+        self.effectIndex = (self.effectIndex + 1) % len(self.EFFECTS)
         print "Effect changed up"
 
 ################################################################################
 
     def changeEffectDown(self):
-        self.EFFECT_INDEX = ((len(self.EFFECTS) + self.EFFECT_INDEX) - 1) % len(self.EFFECTS)
+        self.effectIndex = ((len(self.EFFECTS) + self.effectIndex) - 1) % len(self.EFFECTS)
         print "Effect changed down"
 
 ################################################################################
 
     def getEffectName(self):
-        return self.EFFECTS[self.EFFECT_INDEX]
+        return self.EFFECTS[self.effectIndex]
 
 ################################################################################
 

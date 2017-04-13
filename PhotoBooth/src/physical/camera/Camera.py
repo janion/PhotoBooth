@@ -24,7 +24,6 @@ class Camera():
                    #"posterise" :,
                    #"colorbalance" :
                    ]
-    EFFECT_INDEX = -1;
     
     PHOTO_FILE_EXTENSION = ".jpg"
     VIDEO_FILE_EXTENSION = ".h264"
@@ -46,7 +45,18 @@ class Camera():
 
     def startPreview(self, x, y, width, height):
         self.camera.start_preview(fullscreen=False, hflip=True, window=(x, y, width, height))
-        self.changeEffect()
+        self.effectIndex = 0;
+        self.camera.image_effect = self.EFFECTS[self.effectIndex]
+
+################################################################################
+
+    def setPreviewFullscreen(self, isFull):
+        self.camera.preview.fullscreen = isFull
+
+################################################################################
+
+    def previewIsFullscreen(self):
+        return self.camera.preview.fullscreen
 
 ################################################################################
 
@@ -56,33 +66,35 @@ class Camera():
 ################################################################################
 
     def changeEffectUp(self):
-        self.EFFECT_INDEX = (self.EFFECT_INDEX + 1) % len(self.EFFECTS)
-        self.camera.image_effect = self.EFFECTS[self.EFFECT_INDEX]
+        self.effectIndex = (self.effectIndex + 1) % len(self.EFFECTS)
+        self.camera.image_effect = self.EFFECTS[self.effectIndex]
 
-        if self.EFFECT_PARAMS[self.EFFECT_INDEX] != None:
-            self.camera.image_effect_params = self.EFFECT_PARAMS[self.EFFECT_INDEX]
+        if self.EFFECT_PARAMS[self.effectIndex] != None:
+            self.camera.image_effect_params = self.EFFECT_PARAMS[self.effectIndex]
 
 ################################################################################
 
     def changeEffectDown(self):
-        self.EFFECT_INDEX = ((len(self.EFFECTS) + self.EFFECT_INDEX) - 1) % len(self.EFFECTS)
-        self.camera.image_effect = self.EFFECTS[self.EFFECT_INDEX]
+        self.effectIndex = ((len(self.EFFECTS) + self.effectIndex) - 1) % len(self.EFFECTS)
+        self.camera.image_effect = self.EFFECTS[self.effectIndex]
 
-        if self.EFFECT_PARAMS[self.EFFECT_INDEX] != None:
-            self.camera.image_effect_params = self.EFFECT_PARAMS[self.EFFECT_INDEX]
+        if self.EFFECT_PARAMS[self.effectIndex] != None:
+            self.camera.image_effect_params = self.EFFECT_PARAMS[self.effectIndex]
 
 ################################################################################
 
     def getEffectName(self):
-        return self.EFFECTS[self.EFFECT_INDEX]
+        return self.EFFECTS[self.effectIndex]
 
 ################################################################################
 
     def takePhoto(self):
         if self.isInSequence:
-            self.camera.capture(self.PHOTO_SEQUENCE_NAME_FORMAT % ((self.videoCount + 1), self.sequenceIndex))
+            self.camera.capture(self.PHOTO_SEQUENCE_NAME_FORMAT % ((self.photoCount + 1), self.sequenceIndex))
         else:
-            self.camera.capture(self.PHOTO_NAME_FORMAT % (self.videoCount + 1))
+            self.camera.capture(self.PHOTO_NAME_FORMAT % (self.photoCount + 1))
+        
+        self.photoCount += 1
 
 ################################################################################
 
@@ -105,6 +117,7 @@ class Camera():
 
     def startRecording(self):
         self.camera.start_recording(self.VIDEO_NAME_FORMAT % (self.videoCount + 1))
+        self.videoCount += 1
 
 ################################################################################
 
