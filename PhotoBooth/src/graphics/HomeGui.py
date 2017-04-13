@@ -8,8 +8,8 @@ import wx
 from time import sleep, time
 from threading import Thread
 
-from src.physical.camera.MockCamera import Camera
-from src.physical.triggers.MockPhysicalTriggers import PhysicalTriggers
+from physical.camera.MockCamera import Camera
+from physical.triggers.MockPhysicalTriggers import PhysicalTriggers
 
 class Window(wx.Frame):
 
@@ -237,14 +237,14 @@ class Window(wx.Frame):
             
             while(time() < startTime + 1 + (self.VIDEO_MAX_LENGTH - x)):
                 if not self.isRecording:
-                    break;
+                    break
                 sleep(0.01)
                 
             if not self.isRecording:
                 # Reset labels
                 wx.CallAfter(self.label1.SetForegroundColour, None)
                 wx.CallAfter(self.label2.SetForegroundColour, None)
-                break;
+                break
                 
         wx.CallAfter(self.label1.SetLabel, "")
         wx.CallAfter(self.label2.SetLabel, "")
