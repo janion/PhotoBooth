@@ -30,16 +30,17 @@ class Window(wx.Frame):
     PHOTO_SEQUENCE_GAP_TIME = 1
     VIDEO_MAX_LENGTH = 30
 
-    def __init__(self, parent, idd):
+    def __init__(self, parent, idd, camera, physicalTriggers=None):
         wx.Frame.__init__(self, parent, idd)
         self.panel = wx.Panel(self, -1)
 
+        self.camera = camera
+        if physicalTriggers:
+            physicalTriggers.start(self.changeMode, self.doCameraAction, self.changeEffectUp, self.changeEffectDown)
+
         self.isTakingPhoto = False
         self.isRecording = False
-        self.setupCamera()
         self.SetTitle(self.TITLE % self.camera.getPhotoDirectory())
-        physicalTriggers = PhysicalTriggers()
-        physicalTriggers.start(self.changeMode, self.doCameraAction, self.changeEffectUp, self.changeEffectDown)
         
         topSizer = self.createLabels()
         bottomSizer = self.createButtons()
@@ -111,12 +112,6 @@ class Window(wx.Frame):
         self.effectBtn.Bind(wx.EVT_BUTTON, self.changeEffectUp)
         
         return bottomSizer
-
-################################################################################
-
-    def setupCamera(self):
-        self.camera = Camera()
-        self.camera.startPreview(1000, 1000, 1280, 1024)
             
 ################################################################################
             

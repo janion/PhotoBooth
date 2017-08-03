@@ -6,9 +6,14 @@ Created on 9 Jul 2016
 
 import wx
 from graphics.HomeGui import Window
+from physical.camera.Camera import Camera
+from physical.triggers.PhysicalTriggers import PhysicalTriggers
 
 if __name__ == '__main__':
     app = wx.App()
-    fr = Window(None, -1)
+    camera = Camera()
+    camera.startPreview(1000, 1000, 1280, 1024)
+
+    fr = Window(None, -1, camera, PhysicalTriggers())
     fr.Show()
     app.MainLoop()
