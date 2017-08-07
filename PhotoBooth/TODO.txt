@@ -1,10 +1,12 @@
-- Change countdown format or preview size
++ Change countdown format or preview size
 - Programatic conversion of videos
 - Audio for videos
 - Show pictures after taken for ~3s
 - Factor out mode
-- Allow effect names to use to be better
-- Add
++ Allow effect names to use to be better
++- Add solarize effect (needs better config experimentation - quick gui with sliders)
+- Hide a "Go!" button covering the area of the preview so a touch screen can trigger a photo
+- Add functionality such that only one canvas widget consumes the event (return a boolean)
 
 *- Make into undecorated window
 *- Right click menu to change options

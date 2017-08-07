@@ -74,7 +74,7 @@ class CanvasLabel(object):
 
         if self.mousePressed:
             dc.SetPen(wx.Pen(self.CLICKED_BORDER_COLOUR, self.CLICKED_BORDER_WIDTH))
-            dc.SetBrush(wx.Brush(self.CLICKED_BORDER_COLOUR, style=wx.BRUSHSTYLE_TRANSPARENT))
+            dc.SetBrush(wx.Brush(self.CLICKED_BORDER_COLOUR, style=wx.TRANSPARENT))
             dc.DrawRoundedRectangle(position[0] - self.PADDING,
                                     position[1] - self.PADDING,
                                     width + 2 * self.PADDING,

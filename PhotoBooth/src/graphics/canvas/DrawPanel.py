@@ -46,12 +46,14 @@ class DrawPanel(wx.Panel):
         for widget in self.widgets:
             widget.mouseDown(event, dc)
         self.redraw()
+        event.Skip()
 
     def _mouseUp(self, event):
         dc = wx.MemoryDC(self.BufferBmp)
         for widget in self.widgets:
             widget.mouseUp(event, dc)
         self.redraw()
+        event.Skip()
 
     def addWidget(self, widget):
         self.widgets.append(widget)

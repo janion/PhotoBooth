@@ -9,8 +9,7 @@ class Camera():
                "hatch", "gpen", "pastel", "saturation",
                "washedout", "colorpoint", "colorpoint", "colorpoint", "colorpoint",
                "cartoon", "colorswap", "colorswap",
-               "posterise"
-               #"solarize" :,
+               "posterise", "solarize"
                #"film" :,
                #"colorbalance" :
                #, "watercolor"
@@ -18,8 +17,7 @@ class Camera():
 
     EFFECT_PARAMS = [None, None, None, None, None, None, None, None,
                      None, None, 0, 1, 2, 3, None,
-                     0, 1, 7
-                   #"solarize" :,
+                     0, 1, 13, (0, 12, 128, 255, 0)
                    #"film" :,
                    #"posterise" :,
                    #"colorbalance" :
@@ -29,8 +27,7 @@ class Camera():
                     "hatch", "gpen", "pastel", "saturation",
                     "washedout", "green only", "orange only", "blue only", "purple only",
                     "cartoon", "BGR", "BRG",
-                    "posterise"
-                    #"solarize" :,
+                    "posterise", "solarize"
                     #"film" :,
                     #"colorbalance" :
                     #, "watercolor"

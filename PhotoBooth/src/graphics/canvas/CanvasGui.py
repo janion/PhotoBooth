@@ -115,14 +115,11 @@ class Window(wx.Frame):
         menu.Append(203, "Effect Down")
         menu.AppendSeparator()
         menu.Append(204, "Go!")
-        menu.AppendSeparator()
-        menu.Append(205, "Refresh")
 
         self.Bind(wx.EVT_MENU, self.changeMode, id=201)
         self.Bind(wx.EVT_MENU, self.changeEffectUp, id=202)
         self.Bind(wx.EVT_MENU, self.changeEffectDown, id=203)
         self.Bind(wx.EVT_MENU, self.doCameraAction, id=204)
-        self.Bind(wx.EVT_MENU, self.onSizeOrMove, id=205)
 
         return menu
 
@@ -134,7 +131,6 @@ class Window(wx.Frame):
                                          (wx.ACCEL_NORMAL, wx.WXK_UP, 1003),
                                          (wx.ACCEL_NORMAL, wx.WXK_DOWN, 1004),
                                          (wx.ACCEL_NORMAL, wx.WXK_RETURN, 1005),
-                                         (wx.ACCEL_NORMAL, wx.WXK_F5, 1006),
                                          (wx.ACCEL_CTRL, ord('C'), 1007),
                                          (wx.ACCEL_CTRL, ord('Q'), 1008)
                                          ])
@@ -146,7 +142,6 @@ class Window(wx.Frame):
         self.Bind(wx.EVT_MENU, self.changeEffectUp, id=1003)
         self.Bind(wx.EVT_MENU, self.changeEffectDown, id=1004)
         self.Bind(wx.EVT_MENU, self.doCameraAction, id=1005)
-        self.Bind(wx.EVT_MENU, self.onSizeOrMove, id=1006)
         self.Bind(wx.EVT_MENU, lambda __: self.camera.togglePreview(), id=1007)
         self.Bind(wx.EVT_MENU, self.close, id=1008)
         
