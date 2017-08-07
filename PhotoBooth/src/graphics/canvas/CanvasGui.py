@@ -16,12 +16,11 @@ from graphics.canvas.widgets.Image import Image
 
 class Window(wx.Frame):
     
-    COUNTDOWN_FORMAT = "   %d   "
+    COUNTDOWN_FORMAT = " %d "
 
-    TITLE = "PhotoBooth - %s"
     EFFECT_LABEL = "Effect: %s"
     SCREEN_OFFSET_X = 24
-    SCREEN_OFFSET_Y = 46
+    SCREEN_OFFSET_Y = 55
     
     MODE_LABEL = "Mode: %s"
     MODE_SINGLE = "Single"
@@ -37,7 +36,7 @@ class Window(wx.Frame):
     BACKGROUND_IMAGE_PATH = "graphics/nebula.jpg"
 
     def __init__(self, parent, idd, camera, physicalTriggers=None):
-        wx.Frame.__init__(self, parent, idd)
+        wx.Frame.__init__(self, parent, idd, style = wx.RESIZE_BORDER)
 
         self.camera = camera
         if physicalTriggers:
@@ -45,21 +44,11 @@ class Window(wx.Frame):
 
         self.isTakingPhoto = False
         self.isRecording = False
-        self.SetTitle(self.TITLE % self.camera.getPhotoDirectory())
-        
-        # self.timeFont = wx.Font(0, wx.SWISS, wx.NORMAL, wx.BOLD)
-        # self.timeText = ""
-        # self.timeColour = "WHITE"
-        #
-        # self.optionsFont = wx.Font(0, wx.SWISS, wx.NORMAL, wx.BOLD)
-        # self.optionsColour = "WHITE"
         
         self.mode = 0
-    
         self.panel = DrawPanel(self)
-        
-        self.Maximize()
-        self.setupMenu()
+
+        self.setupMenus()
 
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Bind(wx.EVT_SIZE, self.onSizeOrMove)
@@ -78,44 +67,7 @@ class Window(wx.Frame):
         self.panel.addWidget(self.effectLabel)
         self.panel.addWidget(self.modeLabel)
 
-################################################################################
-    
-    # def drawGui(self, dc):
-    #     dc.BeginDrawing()
-    #
-    #     dc.DrawBitmap(wx.Bitmap(BACKGROUND_IMAGE_PATH), 0, 0)
-    #
-    #     dc.SetTextForeground(self.timeColour)
-    #     dc.SetFont(self.timeFont)
-    #
-    #     width, height = dc.GetTextExtent(self.timeText)
-    #     dc.DrawText(self.timeText, 0, (self.panel.Size[1] / 3) - (height / 2))
-    #     dc.DrawText(self.timeText, self.panel.Size[0] - width, (self.panel.Size[1] / 3) - (height / 2))
-    #
-    #     dc.SetTextForeground(self.optionsColour)
-    #     dc.SetFont(self.optionsFont)
-    #
-    #     effectLabel = self.EFFECT_LABEL % self.camera.getEffectName()
-    #     modeLabel = self.MODE_LABEL % self.MODES[self.mode]
-    #
-    #     width, height = dc.GetTextExtent(effectLabel)
-    #     dc.DrawText(effectLabel, (self.panel.Size[0] / 3) - (width / 2), (self.panel.Size[1] * 0.9) - (height / 2))
-    #
-    #     width, height = dc.GetTextExtent(modeLabel)
-    #     dc.DrawText(modeLabel, ((2 * self.panel.Size[0]) / 3) - (width / 2), (self.panel.Size[1] * 0.9) - (height / 2))
-    #
-    #     # dc.SetPen(wx.Pen("RED", 3))
-    #     # dc.SetBrush(wx.Brush("BLACK", style=wx.BRUSHSTYLE_TRANSPARENT))
-    #     # padding = 10
-    #     # width, height = dc.GetTextExtent(effectLabel)
-    #     # dc.DrawRoundedRectangle((self.panel.Size[0] / 3) - (width / 2) - padding,
-    #     #                         (self.panel.Size[1] * 0.9) - (height / 2) - padding,
-    #     #                         width + 2 * padding,
-    #     #                         height + 2 * padding,
-    #     #                         padding
-    #     #                         )
-    #
-    #     dc.EndDrawing()
+        self.ShowFullScreen(True)
 
 ################################################################################
 
@@ -124,54 +76,77 @@ class Window(wx.Frame):
             
 ################################################################################
             
-    def setupMenu(self):
-        self.menuBar = wx.MenuBar()
-        
-        # File menu
-        menu1 = wx.Menu()
-        menu1.Append(101, "Set photo directory")
-        menu1.AppendSeparator()
-        menu1.Append(102, "Quit")
-        self.menuBar.Append(menu1, "File")
-        
-        # Camera menu
-        menu2 = wx.Menu()
-        menu2.Append(201, "Change Mode")
-        menu2.Append(202, "Effect Up")
-        menu2.Append(203, "Effect Down")
-        menu2.AppendSeparator()
-        menu2.Append(205, "Refresh")
-        menu2.AppendSeparator()
-        menu2.Append(204, "Go!")
-        self.menuBar.Append(menu2, "Camera")
-        
-        self.SetMenuBar(self.menuBar)
-        
+    def setupMenus(self):
+        contextMenu = wx.Menu()
+        contextMenu.AppendMenu(-1, "File", self._createFileMenu())
+        contextMenu.AppendMenu(-1, "Camera", self._createCameraMenu())
+        self._createKeyboardShortcuts()
+
+        self.Bind(wx.EVT_CONTEXT_MENU, lambda __: self._contextMenu(contextMenu))
+
+################################################################################
+
+    def _createFileMenu(self):
+        menu = wx.Menu()
+        menu.Append(101, "Set photo directory")
+        menu.AppendSeparator()
+        menu.Append(102, "Quit")
+
         self.Bind(wx.EVT_MENU, self.setPhotoDirectory, id=101)
         self.Bind(wx.EVT_MENU, self.close, id=102)
-        
+
+        return menu
+
+################################################################################
+
+    def _createCameraMenu(self):
+        menu = wx.Menu()
+        menu.Append(201, "Change Mode")
+        menu.Append(202, "Effect Up")
+        menu.Append(203, "Effect Down")
+        menu.AppendSeparator()
+        menu.Append(204, "Go!")
+        menu.AppendSeparator()
+        menu.Append(205, "Refresh")
+
         self.Bind(wx.EVT_MENU, self.changeMode, id=201)
         self.Bind(wx.EVT_MENU, self.changeEffectUp, id=202)
         self.Bind(wx.EVT_MENU, self.changeEffectDown, id=203)
         self.Bind(wx.EVT_MENU, self.doCameraAction, id=204)
         self.Bind(wx.EVT_MENU, self.onSizeOrMove, id=205)
-        
-        # Setup keyboard shortcuts
+
+        return menu
+
+################################################################################
+
+    def _createKeyboardShortcuts(self):
         shortcuts = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('P'), 1001),
                                          (wx.ACCEL_NORMAL, wx.WXK_SPACE, 1002),
                                          (wx.ACCEL_NORMAL, wx.WXK_UP, 1003),
                                          (wx.ACCEL_NORMAL, wx.WXK_DOWN, 1004),
                                          (wx.ACCEL_NORMAL, wx.WXK_RETURN, 1005),
-                                         (wx.ACCEL_NORMAL, wx.WXK_F5, 1006)
+                                         (wx.ACCEL_NORMAL, wx.WXK_F5, 1006),
+                                         (wx.ACCEL_CTRL, ord('C'), 1007),
+                                         (wx.ACCEL_CTRL, ord('Q'), 1008)
                                          ])
+
         self.SetAcceleratorTable(shortcuts)
+
         self.Bind(wx.EVT_MENU, self.toggleFullScreen, id=1001)
         self.Bind(wx.EVT_MENU, self.changeMode, id=1002)
         self.Bind(wx.EVT_MENU, self.changeEffectUp, id=1003)
         self.Bind(wx.EVT_MENU, self.changeEffectDown, id=1004)
         self.Bind(wx.EVT_MENU, self.doCameraAction, id=1005)
         self.Bind(wx.EVT_MENU, self.onSizeOrMove, id=1006)
+        self.Bind(wx.EVT_MENU, lambda __: self.camera.togglePreview(), id=1007)
+        self.Bind(wx.EVT_MENU, self.close, id=1008)
         
+################################################################################
+
+    def _contextMenu(self, menu):
+        self.PopupMenu(menu)
+        # menu.Destroy()
+
 ################################################################################
 
     def setPhotoDirectory(self, event):

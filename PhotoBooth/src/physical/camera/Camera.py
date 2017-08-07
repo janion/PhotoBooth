@@ -103,6 +103,14 @@ class Camera():
 
 ################################################################################
 
+    def togglePreview(self):
+        if self.camera.preview:
+            self.stopPreview()
+        else:
+            self.startPreview()
+
+################################################################################
+
     def setPhotoDirectory(self, directory):
         self.directory = directory
         self.photoCount = len([name for name in os.listdir(self.directory) if name.endswith(self.PHOTO_FILE_EXTENSION)])

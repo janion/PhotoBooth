@@ -1,0 +1,7 @@
+- Change countdown format or preview size
+*- Right click menu to change options
+*- Keyboard shortcut to stop camera
+- Programatic conversion of videos
+- Audio for videos
+- Show pictures after taken for ~3s
+*- Make into undecorated window

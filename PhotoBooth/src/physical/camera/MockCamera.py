@@ -15,6 +15,7 @@ class Camera():
     def __init__(self,):
         print "Camera created"
         self.directory = os.getcwd()
+        self.preview = False
 
 ################################################################################
 
@@ -23,8 +24,9 @@ class Camera():
 
 ################################################################################
 
-    def startPreview(self, x, y, width, height):
+    def startPreview(self, x=0, y=0, width=0, height=0):
         print "Preview started"
+        self.preview = True
 
 ################################################################################
 
@@ -71,6 +73,15 @@ class Camera():
 
     def stopPreview(self):
         print "Preview stopped"
+        self.preview = False
+
+################################################################################
+
+    def togglePreview(self):
+        if self.preview:
+            self.stopPreview()
+        else:
+            self.startPreview()
 
 ################################################################################
 
