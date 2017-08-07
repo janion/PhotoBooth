@@ -16,6 +16,9 @@ class DrawPanel(wx.Panel):
 
         self.Bind(wx.EVT_SIZE, self.redraw)
         self.Bind(wx.EVT_PAINT, self._onPaint)
+
+        self.Bind(wx.EVT_LEFT_DOWN, self._mouseDown)
+        self.Bind(wx.EVT_LEFT_UP, self._mouseUp)
         
     def redraw(self, event=None):
         self.BufferBmp = wx.EmptyBitmap(self.Size[0], self.Size[1])
@@ -24,11 +27,11 @@ class DrawPanel(wx.Panel):
         self._drawWidgets(memdc)
         self.Refresh()
 
-    def addWidget(self, widget):
-        self.widgets.append(widget)
-
-    def removeWidget(self, widget):
-        self.widgets.remove(widget)
+    def _onPaint(self, event):
+        dc = wx.PaintDC(self)
+        dc.BeginDrawing()
+        dc.DrawBitmap(self.BufferBmp, 0, 0, True)
+        dc.EndDrawing()
 
     def _drawWidgets(self, dc):
         dc.BeginDrawing()
@@ -38,8 +41,20 @@ class DrawPanel(wx.Panel):
 
         dc.EndDrawing()
 
-    def _onPaint(self, event):
-        dc = wx.PaintDC(self)
-        dc.BeginDrawing()
-        dc.DrawBitmap(self.BufferBmp, 0, 0, True)
-        dc.EndDrawing()
+    def _mouseDown(self, event):
+        dc = wx.MemoryDC(self.BufferBmp)
+        for widget in self.widgets:
+            widget.mouseDown(event, dc)
+        self.redraw()
+
+    def _mouseUp(self, event):
+        dc = wx.MemoryDC(self.BufferBmp)
+        for widget in self.widgets:
+            widget.mouseUp(event, dc)
+        self.redraw()
+
+    def addWidget(self, widget):
+        self.widgets.append(widget)
+
+    def removeWidget(self, widget):
+        self.widgets.remove(widget)

@@ -2,6 +2,7 @@
 
 import os
 
+
 class Camera():
     EFFECTS = ["none", "negative", "sketch", "emboss", "oilpaint",
                "hatch", "gpen", "pastel", "saturation",
@@ -9,6 +10,18 @@ class Camera():
                "cartoon", "colorswap", "colorswap",
                "posterise"
                ]
+
+    EFFECT_NAMES = ["none", "negative", "sketch", "emboss", "oilpaint",
+                    "hatch", "gpen", "pastel", "saturation",
+                    "washedout", "green only", "orange only", "blue only", "purple only",
+                    "cartoon", "BGR", "BRG",
+                    "posterise"
+                    #"solarize" :,
+                    #"film" :,
+                    #"colorbalance" :
+                    #, "watercolor"
+                    ]
+
     effectIndex = 0;
     isFull = False
 
@@ -62,7 +75,7 @@ class Camera():
 ################################################################################
 
     def getEffectName(self):
-        return self.EFFECTS[self.effectIndex]
+        return self.EFFECT_NAMES[self.effectIndex]
 
 ################################################################################
 

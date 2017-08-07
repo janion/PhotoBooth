@@ -58,8 +58,17 @@ class Window(wx.Frame):
         self.background = Image(self.BACKGROUND_IMAGE_PATH)
         self.leftTimeLabel = CanvasLabel(colour="WHITE", alignment=Alignment.CENTRE_LEFT)
         self.rightTimeLabel = CanvasLabel(colour="WHITE", alignment=Alignment.CENTRE_RIGHT)
-        self.effectLabel = CanvasLabel(text=self.EFFECT_LABEL % self.camera.getEffectName(), colour="WHITE", alignment=Alignment.CENTRE)
-        self.modeLabel = CanvasLabel(text=self.MODE_LABEL % self.MODES[self.mode], colour="WHITE", alignment=Alignment.CENTRE)
+        self.effectLabel = CanvasLabel(text=self.EFFECT_LABEL % self.camera.getEffectName(),
+                                       colour="WHITE",
+                                       alignment=Alignment.CENTRE,
+                                       isClickable=True)
+        self.modeLabel = CanvasLabel(text=self.MODE_LABEL % self.MODES[self.mode],
+                                     colour="WHITE",
+                                     alignment=Alignment.CENTRE,
+                                     isClickable=True)
+
+        self.effectLabel.addHandler(self.changeEffectUp)
+        self.modeLabel.addHandler(self.changeMode)
 
         self.panel.addWidget(self.background)
         self.panel.addWidget(self.leftTimeLabel)
@@ -156,7 +165,6 @@ class Window(wx.Frame):
         # process the data.
         if dlg.ShowModal() == wx.ID_OK:
             self.camera.setPhotoDirectory(dlg.GetPath())
-            self.SetTitle(self.TITLE % self.camera.getPhotoDirectory())
 
         dlg.Destroy()
 

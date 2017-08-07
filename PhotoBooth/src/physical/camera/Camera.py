@@ -24,6 +24,17 @@ class Camera():
                    #"posterise" :,
                    #"colorbalance" :
                    ]
+
+    EFFECT_NAMES = ["none", "negative", "sketch", "emboss", "oilpaint",
+                    "hatch", "gpen", "pastel", "saturation",
+                    "washedout", "green only", "orange only", "blue only", "purple only",
+                    "cartoon", "BGR", "BRG",
+                    "posterise"
+                    #"solarize" :,
+                    #"film" :,
+                    #"colorbalance" :
+                    #, "watercolor"
+                    ]
     
     PHOTO_FILE_EXTENSION = ".jpg"
     VIDEO_FILE_EXTENSION = ".h264"
@@ -35,6 +46,7 @@ class Camera():
         self.camera = PiCamera()
         self.setPhotoDirectory(os.getcwd())
         self.isInSequence = False
+        self.window = None
 
 ################################################################################
 
@@ -43,10 +55,12 @@ class Camera():
 
 ################################################################################
 
-    def startPreview(self, x, y, width, height):
-        self.camera.start_preview(fullscreen=False, hflip=True, window=(x, y, width, height))
-        self.effectIndex = 0;
-        self.camera.image_effect = self.EFFECTS[self.effectIndex]
+    def startPreview(self, x, y, width, height, resetMode=True):
+        self.window = (x, y, width, height)
+        self.camera.start_preview(fullscreen=False, hflip=True, window=self.window)
+        if resetMode:
+            self.effectIndex = 0;
+            self.camera.image_effect = self.EFFECTS[self.effectIndex]
 
 ################################################################################
 
@@ -61,7 +75,8 @@ class Camera():
 ################################################################################
 
     def setPreview(self, x, y, width, height):
-        self.camera.preview.window = (x, y, width, height)
+        self.window = (x, y, width, height)
+        self.camera.preview.window = self.window
 
 ################################################################################
 
@@ -84,7 +99,7 @@ class Camera():
 ################################################################################
 
     def getEffectName(self):
-        return self.EFFECTS[self.effectIndex]
+        return self.EFFECT_NAMES[self.effectIndex]
 
 ################################################################################
 
@@ -107,7 +122,7 @@ class Camera():
         if self.camera.preview:
             self.stopPreview()
         else:
-            self.startPreview()
+            self.startPreview(*self.window, resetMode=False)
 
 ################################################################################
 
