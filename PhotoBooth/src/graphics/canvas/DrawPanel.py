@@ -11,7 +11,7 @@ class DrawPanel(wx.Panel):
     
     def __init__(self, parent):
         wx.Panel.__init__(self, parent, -1)
-        self.BufferBmp = None
+        self.BufferBmp = wx.EmptyBitmap(0, 0)
         self.widgets = []
 
         self.Bind(wx.EVT_SIZE, self.redraw)
@@ -43,15 +43,17 @@ class DrawPanel(wx.Panel):
 
     def _mouseDown(self, event):
         dc = wx.MemoryDC(self.BufferBmp)
-        for widget in self.widgets:
-            widget.mouseDown(event, dc)
+        for widget in list(reversed(self.widgets)):
+            if widget.mouseDown(event, dc):
+                break
         self.redraw()
         event.Skip()
 
     def _mouseUp(self, event):
         dc = wx.MemoryDC(self.BufferBmp)
-        for widget in self.widgets:
-            widget.mouseUp(event, dc)
+        for widget in list(reversed(self.widgets)):
+            if widget.mouseUp(event, dc):
+                break
         self.redraw()
         event.Skip()
 

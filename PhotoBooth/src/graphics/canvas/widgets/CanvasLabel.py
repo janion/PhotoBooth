@@ -83,6 +83,7 @@ class CanvasLabel(object):
                                     )
 
     def mouseDown(self, event, dc):
+        eventConsumed = False
         if self.isClickable:
             width, height = self.size
             position = _movePosition(self.position, width, height, self.alignment)
@@ -90,8 +91,12 @@ class CanvasLabel(object):
             if position[0] < eventPosition[0] < position[0] + width:
                 if position[1] < eventPosition[1] < position[1] + height:
                     self.mousePressed = True
+                    eventConsumed = True
+
+        return eventConsumed
 
     def mouseUp(self, event, dc):
+        eventConsumed = False
         if self.isClickable:
             width, height = self.size
             position = _movePosition(self.position, width, height, self.alignment)
@@ -101,8 +106,10 @@ class CanvasLabel(object):
                     if self.mousePressed:
                         for handler in self.handlers:
                             handler(event)
+                            eventConsumed = True
 
-            self.mousePressed = False
+        self.mousePressed = False
+        return eventConsumed
 
     def addHandler(self, handler):
         self.handlers.append(handler)

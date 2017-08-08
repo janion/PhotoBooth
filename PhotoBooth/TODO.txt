@@ -4,11 +4,16 @@
 - Show pictures after taken for ~3s
 - Factor out mode
 + Allow effect names to use to be better
-+- Add solarize effect (needs better config experimentation - quick gui with sliders)
-- Hide a "Go!" button covering the area of the preview so a touch screen can trigger a photo
-- Add functionality such that only one canvas widget consumes the event (return a boolean)
++ Add solarize effect (needs better config experimentation - quick gui with sliders)
+- Add overlays to camera : http://picamera.readthedocs.io/en/release-1.10/recipes1.html#overlaying-images-on-the-preview
+- Allow configuration of the brightness & exposure to deal with different lighting conditions
+- Add keyboard shortcut to disable the context menu (only if long touch on touch screen brings it up)
 
 *- Make into undecorated window
 *- Right click menu to change options
 *- Keyboard shortcut to stop camera
 *- Make canvas labels clickable
+*- Hide a "Go!" button covering the area of the preview so a touch screen can trigger a photo
+*- Hide cursor
+*- Add functionality such that only one canvas widget consumes the event (return a boolean)
+*- Help window on F1

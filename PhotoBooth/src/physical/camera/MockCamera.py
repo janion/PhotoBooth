@@ -27,17 +27,19 @@ class Camera():
 
     def __init__(self,):
         print "Camera created"
+        self.window = (0, 0, 0, 0)
         self.directory = os.getcwd()
         self.preview = False
 
 ################################################################################
 
     def getPreviewSize(self):
-        return (1000, 1000)
+        return self.window[2:]
 
 ################################################################################
 
     def startPreview(self, x=0, y=0, width=0, height=0):
+        self.window = (x, y, width, height)
         print "Preview started"
         self.preview = True
 
@@ -58,6 +60,7 @@ class Camera():
 ################################################################################
 
     def setPreview(self, x, y, width, height):
+        self.window = (x, y, width, height)
         print "Preview set"
 
 ################################################################################

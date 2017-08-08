@@ -12,6 +12,7 @@ import wx
 from graphics.canvas.DrawPanel import DrawPanel
 from graphics.canvas.widgets.CanvasLabel import CanvasLabel, Alignment
 from graphics.canvas.widgets.Image import Image
+from graphics.canvas.widgets.EmptyArea import EmptyArea
 
 
 class Window(wx.Frame):
@@ -44,6 +45,7 @@ class Window(wx.Frame):
 
         self.isTakingPhoto = False
         self.isRecording = False
+        self.cursorShown = True
         
         self.mode = 0
         self.panel = DrawPanel(self)
@@ -66,11 +68,14 @@ class Window(wx.Frame):
                                      colour="WHITE",
                                      alignment=Alignment.CENTRE,
                                      isClickable=True)
+        self.goArea = EmptyArea(0, 0, 0, 0)
 
         self.effectLabel.addHandler(self.changeEffectUp)
         self.modeLabel.addHandler(self.changeMode)
+        self.goArea.addHandler(self.doCameraAction)
 
         self.panel.addWidget(self.background)
+        self.panel.addWidget(self.goArea)
         self.panel.addWidget(self.leftTimeLabel)
         self.panel.addWidget(self.rightTimeLabel)
         self.panel.addWidget(self.effectLabel)
@@ -78,7 +83,7 @@ class Window(wx.Frame):
 
         self.ShowFullScreen(True)
 
-################################################################################
+    ################################################################################
 
     def toggleFullScreen(self, event):
         self.camera.setPreviewFullscreen(not self.camera.previewIsFullscreen())
@@ -132,7 +137,9 @@ class Window(wx.Frame):
                                          (wx.ACCEL_NORMAL, wx.WXK_DOWN, 1004),
                                          (wx.ACCEL_NORMAL, wx.WXK_RETURN, 1005),
                                          (wx.ACCEL_CTRL, ord('C'), 1007),
-                                         (wx.ACCEL_CTRL, ord('Q'), 1008)
+                                         (wx.ACCEL_CTRL, ord('Q'), 1008),
+                                         (wx.ACCEL_CTRL, ord('M'), 1009),
+                                         (wx.ACCEL_NORMAL, wx.WXK_F1, 1010)
                                          ])
 
         self.SetAcceleratorTable(shortcuts)
@@ -144,7 +151,36 @@ class Window(wx.Frame):
         self.Bind(wx.EVT_MENU, self.doCameraAction, id=1005)
         self.Bind(wx.EVT_MENU, lambda __: self.camera.togglePreview(), id=1007)
         self.Bind(wx.EVT_MENU, self.close, id=1008)
+        self.Bind(wx.EVT_MENU, self._toggleCursor, id=1009)
+        self.Bind(wx.EVT_MENU, self._showAboutDialog, id=1010)
+
+################################################################################
+
+    def _showAboutDialog(self, event):
+        info = wx.AboutDialogInfo()
+        info.Name = "PhotoBooth"
+        info.Description = ("Space     =    Change mode\n"+
+                            "Up        =    Change effect up\n"+
+                            "Down      =    Change effect down\n"+
+                            "Return    =    Do camera action\n"+
+
+                            "Ctrl+P    =    Toggle camera fullscreen\n"+
+                            "Ctrl+C    =    Toggle camera preview\n"+
+                            "Ctrl+M    =    Hide mouse cursor\n"+
+                            "Ctrl+Q    =    Quit\n")
+
+        wx.AboutBox(info)
         
+################################################################################
+
+    def _toggleCursor(self, __):
+        if self.cursorShown:
+            self.SetCursor(wx.StockCursor(wx.CURSOR_BLANK))
+        else:
+            self.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
+
+        self.cursorShown = not self.cursorShown
+
 ################################################################################
 
     def _contextMenu(self, menu):
@@ -179,6 +215,7 @@ class Window(wx.Frame):
         newWidth = int(0.75 * width)
 
         self.camera.setPreview(x, y, newWidth, int(newWidth * resRatio))
+        self.goArea.setArea(x, y, newWidth, int(newWidth * resRatio))
 
         self.leftTimeLabel.setFont(wx.Font(width / 12, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.rightTimeLabel.setFont(wx.Font(width / 12, wx.SWISS, wx.NORMAL, wx.BOLD))

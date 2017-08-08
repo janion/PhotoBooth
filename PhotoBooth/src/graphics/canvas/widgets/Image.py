@@ -11,7 +11,7 @@ class Image(object):
         dc.DrawBitmap(self.bmp, *self.position)
 
     def mouseDown(self, event, dc):
-        pass
+        return False
 
     def mouseUp(self, event, dc):
-        pass
+        return False

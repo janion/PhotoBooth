@@ -12,7 +12,8 @@ from physical.triggers.MockPhysicalTriggers import PhysicalTriggers
 if __name__ == '__main__':
     app = wx.App()
     camera = Camera()
-    camera.startPreview(1000, 1000, 1280, 1024)
+    # camera.startPreview(1000, 1000, 1280, 1024)
+    camera.startPreview(1000, 1000, 1280, 960)
 
     fr = Window(None, -1, camera, PhysicalTriggers())
     fr.Show()
